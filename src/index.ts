@@ -1,6 +1,6 @@
 export {Factory} from './Factory';
 export {StandardPdfFonts, PdfKitContext} from './PdfKitContext';
-export {FPdfContext} from './FPdfContext';
+// export {FPdfContext} from './FPdfContext';
 export {
     ViewDesc,
     RichTextDesc,
