@@ -1,16 +1,17 @@
 {
   "name": "graphics-layout",
   "version": "0.0.1",
-  "description": "",
+  "description": "A TypeScript library for rendering complex PDFs and images",
+  "author": "GradeCam LLC",
+  "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc --project .",
+    "dev": "tsc --watch --project .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["pdf", "typescript", "images"],
   "dependencies": {
     "css": "^2.2.1",
     "css-value": "0.0.1",
@@ -23,5 +24,12 @@
     "@types/css": "0.0.30",
     "@types/htmlparser2": "^3.7.30",
     "@types/pdfkit": "~0.7.35"
-  }
+  },
+  "engines": {
+    "node": ">= 6"
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": "gradecam/graphics-layout"
 }
