@@ -1,5 +1,8 @@
+import * as PDFDocument from 'pdfkit';
+
 export {Factory} from './Factory';
 export {StandardPdfFonts, PdfKitContext} from './PdfKitContext';
+export {JsonContext} from './JsonContext';
 // export {FPdfContext} from './FPdfContext';
 export {
     ViewDesc,
@@ -15,3 +18,4 @@ export {HorizontalAlignment, VerticalAlignment} from './Alignment';
 export {FrameView} from './FrameView';
 export {renderHtml, HtmlRenderOpts, FontSelector, CssSelectorMap} from './HtmlRenderer';
 export {Point} from './Context';
+export { PDFDocument };

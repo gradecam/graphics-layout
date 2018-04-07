@@ -1,3 +1,4 @@
+import * as PDFDocument from 'pdfkit';
 import {
     Context,
     FontMetrics,
@@ -5,7 +6,6 @@ import {
     Point,
     ImageOpts
 } from './Context';
-import * as PDFDocument from 'pdfkit';
 
 function strEnum<T extends string>(o: Array<T>): {[K in T]: K} {
   return o.reduce((res, key) => {
@@ -34,6 +34,9 @@ export class PdfKitContext extends Context {
     private _currentFontSize: number;
 
     setDoc(newDoc: PDFKit.PDFDocument): PdfKitContext {
+        if(!this.doc.currentFontMetrics) {
+            throw new Error('the PDFDocument instance you passed in does not include the requried extensions.');
+        }
         this.doc = newDoc;
         return this;
     }
@@ -193,9 +196,7 @@ export class PdfKitContext extends Context {
     }
 
     drawText(text: string, left: number, top: number, options: TextOpts = {}): PdfKitContext {
-        // console.error('drawText before:', text, left, top);
         let {x, y} = this.pointToOrigin(left, top);
-        // console.error('drawText after :', text, x, y);
         if (this.doc.rawText) {
             this.doc.rawText(text, x, y, options);
         } else {
