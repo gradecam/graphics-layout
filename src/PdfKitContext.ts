@@ -34,7 +34,7 @@ export class PdfKitContext extends Context {
     private _currentFontSize: number;
 
     setDoc(newDoc: PDFKit.PDFDocument): PdfKitContext {
-        if(!this.doc.currentFontMetrics) {
+        if(!newDoc.currentFontMetrics) {
             throw new Error('the PDFDocument instance you passed in does not include the requried extensions.');
         }
         this.doc = newDoc;
