@@ -405,13 +405,14 @@ export type FontSelector = (fontFamilyNames: string[]) => string;
 
 const userAgentSelectorMap = cssStringToSelectorMap(userAgentStyleSheet);
 
-export function renderHtml(
+export function htmlToViewDescTree (
     html: string,
     customCss: CssSelectorMap,
-    superView: View,
     fontSelector: FontSelector,
     opts?: HtmlRenderOpts
-) {
+): ViewDesc {
+    // console.log("============> heeeeerrrrrreeeee!!!!!");
+    // console.log(html);
     let cssSelectorMap = Object.assign({}, userAgentSelectorMap, customCss);
 
     const defaultOpts: HtmlRenderOpts = {defaultFont: 'Helvetica', defaultFontSize: 12};
@@ -563,8 +564,20 @@ export function renderHtml(
     parser.write(html);
     parser.end();
 
+    return rootContainer;
+}
+
+export function renderHtml (
+    html: string,
+    customCss: CssSelectorMap,
+    superView: View,
+    fontSelector: FontSelector,
+    opts?: HtmlRenderOpts
+) {
+    const viewDescTree = htmlToViewDescTree(html, customCss, fontSelector, opts);
     // printDescTree(rootContainer);
-    let generatedViewTree = Factory(rootContainer);
+    let generatedViewTree = Factory(viewDescTree);
+    // console.log(JSON.stringify(generatedViewTree, null, 4));
     superView.addSubview(generatedViewTree);
 }
 
