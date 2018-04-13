@@ -24,6 +24,7 @@ export class TextRun {
     }
 
     setText(text: string): TextRun {
+        text = text ? text.toString() : '';
         const isNonBreakingSpace = text == "\u00A0";
         if(isNonBreakingSpace) {
             this.words = [text];
