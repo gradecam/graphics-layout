@@ -8,8 +8,7 @@ export class TextRun {
     public ascender: number;
     public descender: number;
     public lastWordToBeContinued = false;
-    // private words: string[]; FIXME: this should actually be private
-    public words: string[];
+    public words: string[]; // FIXME: this should actually be private
 
     constructor(text: string) {
         this.setText(text);
