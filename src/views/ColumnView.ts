@@ -1,6 +1,6 @@
 import {View, HeightCache} from './View';
-import {Context} from './Context';
-import {ColumnDesc} from './ViewDescriptions';
+import {Context} from '../Context';
+import {ColumnDesc} from '../ViewDescriptions';
 
 export class ColumnView extends View {
     public fitHorizontal = true;

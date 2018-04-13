@@ -1,16 +1,16 @@
-import {Word} from './Word';
-import {TextRun} from './TextRun';
-import {TextStyle} from './TextStyle';
-import {TextLine} from './TextLine';
-import {Rect} from './Rect';
+import {Word} from '../Word';
+import {TextRun} from '../TextRun';
+import {TextStyle} from '../TextStyle';
+import {TextLine} from '../TextLine';
+import {Rect} from '../Rect';
 import {View, HeightCache} from './View';
-import {HorizontalAlignment} from './Alignment';
-import {Context} from './Context';
+import {HorizontalAlignment} from '../Alignment';
+import {Context} from '../Context';
 import {
     TextRunDesc,
     TextStyleDesc,
     RichTextDesc
-} from './ViewDescriptions';
+} from '../ViewDescriptions';
 
 export interface LineCache {
     [width: number]: TextLine[];

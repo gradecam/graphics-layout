@@ -1,7 +1,7 @@
-import {Context} from './Context';
-import {Rect} from './Rect';
-import {ViewDesc} from './ViewDescriptions';
-import {Factory} from './Factory';
+import {Context} from '../Context';
+import {Rect} from '../Rect';
+import {ViewDesc} from '../ViewDescriptions';
+import {Factory} from '../Factory';
 
 export interface HeightCache {
     [width: number]: number;

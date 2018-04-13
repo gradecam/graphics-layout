@@ -13,9 +13,9 @@ export {
     FrameDesc,
     AnyView
 } from './ViewDescriptions';
-export {View} from './View';
+export {View} from './views';
 export {HorizontalAlignment, VerticalAlignment} from './Alignment';
-export {FrameView} from './FrameView';
+export {FrameView} from './views';
 export {renderHtml, htmlToViewDescTree, HtmlRenderOpts, FontSelector, CssSelectorMap} from './HtmlRenderer';
 export {Point} from './Context';
 export { PDFDocument };

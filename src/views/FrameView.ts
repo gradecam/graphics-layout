@@ -1,8 +1,8 @@
 import {View, HeightCache} from './View';
-import {HorizontalAlignment, VerticalAlignment} from './Alignment';
-import {Context} from './Context';
-import {FrameDesc} from './ViewDescriptions';
-import {FrameSide} from './FrameSide';
+import {HorizontalAlignment, VerticalAlignment} from '../Alignment';
+import {Context} from '../Context';
+import {FrameDesc} from '../ViewDescriptions';
+import {FrameSide} from '../FrameSide';
 // import {Rect} from './Rect';
 
 export class FrameView extends View {
