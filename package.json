@@ -21,13 +21,13 @@
     "css-value": "0.0.1",
     "htmlparser2": "^3.9.2",
     "pdfkit": "git+https://github.com/gradecam/pdfkit.git#built",
-    "tslint": "~5.7.0",
-    "typescript": "~2.5.2"
   },
   "devDependencies": {
     "@types/css": "0.0.30",
     "@types/htmlparser2": "^3.7.30",
-    "@types/pdfkit": "~0.7.35"
+    "@types/pdfkit": "~0.7.35",
+    "typescript": "~2.5.2",
+    "tslint": "~5.7.0"
   },
   "engines": {
     "node": ">= 6"
