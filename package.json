@@ -20,7 +20,7 @@
     "css": "^2.2.1",
     "css-value": "0.0.1",
     "htmlparser2": "^3.9.2",
-    "pdfkit": "git+https://github.com/gradecam/pdfkit.git#built",
+    "pdfkit": "git+https://github.com/gradecam/pdfkit.git#built"
   },
   "devDependencies": {
     "@types/css": "0.0.30",
