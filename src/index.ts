@@ -2,8 +2,6 @@ import * as PDFDocument from 'pdfkit';
 
 export {Factory} from './Factory';
 export {StandardPdfFonts, PdfKitContext} from './PdfKitContext';
-export {JsonContext} from './JsonContext';
-// export {FPdfContext} from './FPdfContext';
 export {
     ViewDesc,
     RichTextDesc,
