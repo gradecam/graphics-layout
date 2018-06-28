@@ -615,7 +615,7 @@ function handleContainerTag(
     applyFrameViewProprtiesFromCssPropertyMap(cssPropertyMap, newFrameView, emSize);
 
     // now apply the text styles to currentStyle based on the emSize we just calculated
-    applyCssTextStylesFromPropertyMap(cssPropertyMap, currentStyle, emSize);
+    applyCssTextStylesFromPropertyMap(cssPropertyMap, currentStyle, emSize, false);
 
     // now create column view and put it inside the frame
     const newContainer: ColumnDesc = {type: 'Column', name: `${tagName}${count}`};
@@ -634,10 +634,10 @@ function applyCssTextStylesFromPropertyMap(
     cssPropertyMap: CssPropertyMap,
     style: InheritedStyle,
     emSize: number,
-    includeFontSize: boolean = false
+    includeFontSize: boolean
 ) {
     for(let propertyName of Object.keys(cssPropertyMap)) {
-        if(propertyName == 'font-size') { continue; }
+        if(!includeFontSize && propertyName == 'font-size') { continue; }
         if(cssTextDeclarationHandlers[propertyName]) {
             cssTextDeclarationHandlers[propertyName](cssPropertyMap[propertyName], style, emSize);
         }
