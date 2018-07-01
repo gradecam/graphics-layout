@@ -1,4 +1,5 @@
 import {VerticalAlignment, HorizontalAlignment} from './Alignment';
+import {PageSequence, PageContent} from './MultiPage';
 
 export interface TextStyleDesc {
     fontSize?: number;
@@ -22,6 +23,7 @@ export type AnyView =
     RowDesc |
     FrameDesc |
     ViewDesc |
+    RootDesc |
     ImageDesc;
 
 export interface ViewDesc {
@@ -33,7 +35,14 @@ export interface ViewDesc {
     height?: number;
     parent?: ViewDesc;
     subviews?: Array<AnyView>;
+    clip?: boolean;
+    pageSequence?: PageSequence;
+    pageContent?: PageContent;
     _debugOutlineColor?: string;
+}
+
+export interface RootDesc extends ViewDesc {
+    type: 'Root';
 }
 
 export interface RichTextDesc extends ViewDesc {
@@ -45,7 +54,7 @@ export interface RichTextDesc extends ViewDesc {
 
 export interface ColumnDesc extends ViewDesc {
     type: 'Column';
-    useContentHeight?: boolean;
+    useSubviewContentHeights?: boolean;
 }
 
 export interface RowDesc extends ViewDesc {

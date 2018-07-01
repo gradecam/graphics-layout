@@ -4,14 +4,19 @@ import {ColumnDesc} from '../ViewDescriptions';
 
 export class ColumnView extends View {
     public fitHorizontal = true;
-    public useContentHeight = true; // FIXME: change this to useSubviewContentHeights
+    public useSubviewContentHeights = true;
     private heightCache: HeightCache = {};
+    protected _layoutQueue: View[] = [];
 
     static fromDesc(desc: ColumnDesc): ColumnView {
         let column = new ColumnView();
-        if(desc.useContentHeight !== undefined) { column.useContentHeight = desc.useContentHeight; }
         column.setDescFields(desc);
         return column;
+    }
+
+    constructor() {
+        super();
+        this._pageContent = 'flow';
     }
 
     toJSON(): any {
@@ -19,7 +24,15 @@ export class ColumnView extends View {
     }
 
     setDescFields(desc: ColumnDesc) {
+        if(desc.useSubviewContentHeights !== undefined) { this.useSubviewContentHeights = desc.useSubviewContentHeights; }
         super.setDescFields(desc);
+        this._layoutQueue = this.subviews.slice(0);
+    }
+
+    protected get _contentDone(): boolean {
+        console.log(this.name, 'column queue length:', this._layoutQueue.length);
+        const undrawn = this._layoutQueue.length + this._pagesubs.length;
+        return undrawn == 0;
     }
 
     _getContentHeightForWidth(context: Context, width: number): number {
@@ -31,7 +44,7 @@ export class ColumnView extends View {
         let previousBottomMargin = 0;
         for(let subview of this.subviews) {
             let largerMargin = subview.topMargin > previousBottomMargin ? subview.topMargin : previousBottomMargin;
-            if(this.useContentHeight) {
+            if(this.useSubviewContentHeights) {
                 // FIXME: if this.fitHorizontal is false then the width here should probably be the frame width
                 contentHeight += subview.getContentHeightForWidth(context, width) + largerMargin;
             } else {
@@ -45,9 +58,13 @@ export class ColumnView extends View {
     }
 
     layoutSubviews(context: Context) {
+        console.log('ColumnView:layoutSubviews ', this.name);
         let cury: number = 0;
         let previousBottomMargin = 0;
-        for(let subview of this.subviews) {
+        this._pagesubs = [];
+        // for(let subview of this.subviews) {
+        let subview;
+        while(subview = this._layoutQueue.shift()) {
             let newFrame = subview.getFrame();
             let largerMargin = subview.topMargin > previousBottomMargin ? subview.topMargin : previousBottomMargin;
             cury += largerMargin;
@@ -56,14 +73,23 @@ export class ColumnView extends View {
                 newFrame.left = subview.leftMargin;
                 newFrame.width = this.getFrame().width;
             }
-            if(this.useContentHeight) {
+            if(this.useSubviewContentHeights) {
+                console.log('ColumnView:layoutSubviews:', 'before getContentHeightForWidth');
                 newFrame.height = subview.getContentHeightForWidth(context, newFrame.width);
             }
-            // console.error('newFrame:', newFrame);
+            if(this._pageContent == 'flow' && cury + newFrame.height - subview.bottomMargin > this.getFrame().height) {
+                // console.log(`${subview.name} didn't fit`, cury, );
+                console.log(`${subview.name} wouldn't fit`);
+                this._layoutQueue.unshift(subview);
+                return;
+            }
+            console.log(`${subview.name} fit`);
+
             subview.setFrameWithRect(newFrame);
             cury += subview.getFrame().height;
-            // console.error('cury:', cury);
             previousBottomMargin = subview.bottomMargin;
+
+            this._pagesubs.push(subview);
         }
     }
 }

@@ -41,6 +41,10 @@ export class PdfKitContext extends Context {
         return this;
     }
 
+    addPage(): void {
+        this.doc.addPage();
+    }
+
     moveTo(x: number, y: number): PdfKitContext {
         this.doc.moveTo(x, y);
         return this;
@@ -59,6 +63,7 @@ export class PdfKitContext extends Context {
 
     rect(left: number, top: number, width: number, height: number): PdfKitContext {
         let {x, y} = this.pointToOrigin(left, top);
+        console.log('rect:', x, y, width, height);
         this.doc.rect(x, y, width, height);
         return this;
     }

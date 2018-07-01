@@ -6,6 +6,7 @@ export {JsonContext} from './JsonContext';
 // export {FPdfContext} from './FPdfContext';
 export {
     ViewDesc,
+    RootDesc,
     RichTextDesc,
     ColumnDesc,
     TextRunDesc,
@@ -13,7 +14,7 @@ export {
     FrameDesc,
     AnyView
 } from './ViewDescriptions';
-export {View} from './views';
+export {View, RootView} from './views';
 export {HorizontalAlignment, VerticalAlignment} from './Alignment';
 export {FrameView} from './views';
 export {renderHtml, htmlToViewDescTree, HtmlRenderOpts, FontSelector, CssSelectorMap} from './HtmlRenderer';

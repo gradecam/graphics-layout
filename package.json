@@ -11,7 +11,11 @@
     "dev": "tsc --watch --project .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["pdf", "typescript", "images"],
+  "keywords": [
+    "pdf",
+    "typescript",
+    "images"
+  ],
   "dependencies": {
     "css": "^2.2.1",
     "css-value": "0.0.1",

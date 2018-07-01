@@ -31,6 +31,7 @@ export abstract class Context {
     }
 
     // abstract extractFontMetrics(): void;
+    abstract addPage(): void;
     abstract get allFontNames(): string[];
     abstract moveTo(x: number, y: number): Context;
     abstract lineWidth(width: number): Context;

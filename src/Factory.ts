@@ -5,7 +5,8 @@ import {
     ColumnView,
     FrameView,
     ImageView,
-    RowView
+    RowView,
+    RootView
 } from './views';
 
 interface ViewConstructor {
@@ -23,7 +24,8 @@ const viewTypeMap: ViewTypeMap = {
     Column: ColumnView,
     Frame: FrameView,
     Row: RowView,
-    Image: ImageView
+    Image: ImageView,
+    Root: RootView
 };
 
 export function Factory(desc: ViewDesc): View {

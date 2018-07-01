@@ -26,16 +26,7 @@ export class RichTextView extends View {
 
     static fromDesc(desc: RichTextDesc): RichTextView {
         let rich = new RichTextView();
-        if(desc.name) { rich.name = desc.name; }
-        if(desc.alignment) { rich.alignment = desc.alignment; }
-        if(desc.lineGap) { rich.lineGap = desc.lineGap; }
-        let rect = Rect.fromDesc(desc);
-        rich.setFrameWithRect(rect);
-        if(desc.runs) {
-            desc.runs.forEach( (runDesc) => {
-                rich.addTextRun( TextRun.fromDesc(runDesc) );
-            });
-        }
+        rich.setDescFields(desc);
         return rich;
     }
 
@@ -46,6 +37,19 @@ export class RichTextView extends View {
 
     toJSON(): any {
         return {type: 'RichText', name: this.name, frame: this.frame, subviews: this.subviews, runs: this.textRuns};
+    }
+
+    setDescFields(desc: RichTextDesc) {
+        super.setDescFields(desc);
+        if(desc.alignment) { this.alignment = desc.alignment; }
+        if(desc.lineGap) { this.lineGap = desc.lineGap; }
+        let rect = Rect.fromDesc(desc);
+        this.setFrameWithRect(rect);
+        if(desc.runs) {
+            desc.runs.forEach( (runDesc) => {
+                this.addTextRun( TextRun.fromDesc(runDesc) );
+            });
+        }
     }
 
     addTextRun(textRun: TextRun): void {

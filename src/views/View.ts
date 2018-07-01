@@ -2,6 +2,7 @@ import {Context} from '../Context';
 import {Rect} from '../Rect';
 import {ViewDesc} from '../ViewDescriptions';
 import {Factory} from '../Factory';
+import {PageSequence, PageContent} from '../MultiPage';
 
 export interface HeightCache {
     [width: number]: number;
@@ -11,12 +12,17 @@ export class View {
 
     private parent: View | null = null;
     protected subviews: View[] = [];
+    protected _pagesubs: View[] = [];
     protected frame: Rect;
     protected absoluteFrame: Rect;
-    public name: string = 'unnamed';
+    public name = 'unnamed';
     protected _debugOutlineColor: string | null;
     private _cacheContentHeights = true;
     private _contentHeightCache: HeightCache = {};
+    protected _clip = false;
+    protected _pageNumber = 1;
+    protected _pageSequence: PageSequence = [1];
+    protected _pageContent: PageContent = 'repeat';
 
     constructor() {
         this.setFrameWithRect(new Rect());
@@ -34,7 +40,7 @@ export class View {
 
     stringifyRenderTree(depth: number = 0): string {
         let treeString =
-            '\t'.repeat(depth)+ `<${this.constructor.name} left="${this.frame.left}" `
+            '\t'.repeat(depth)+ `<${this.constructor.name} name="${this.name}" left="${this.frame.left}" `
             + `top="${this.frame.top}" width="${this.frame.width}" height="${this.frame.height}">\n`;
         for(let subview of this.subviews) {
             treeString += subview.stringifyRenderTree(depth + 1);
@@ -43,16 +49,79 @@ export class View {
     }
 
     setDescFields(desc: ViewDesc) {
-        if(desc.name) { this.name = desc.name; }
+        // console.log('fromDesc:', desc.pageSequence);
+
         // handle the frame
         let rect = Rect.fromDesc(desc);
         this.setFrameWithRect(rect);
+
+        // copy over the scalar fields
+        if(desc.name) { this.name = desc.name; }
+        if(desc.clip !== undefined) { this._clip = desc.clip; }
+        if(desc.pageSequence !== undefined) { this._pageSequence = desc.pageSequence; }
+        if(desc.pageContent !== undefined) { this._pageContent = desc.pageContent; }
+        if(desc._debugOutlineColor !== undefined) { this._debugOutlineColor = desc._debugOutlineColor; }
+
         // handle the subviews
         if(!desc.subviews) { return; }
         for(let subviewDesc of desc.subviews) {
             this.addSubview( Factory(subviewDesc) );
         }
-        if(desc._debugOutlineColor !== undefined) { this._debugOutlineColor = desc._debugOutlineColor; }
+    }
+
+    shouldDrawOnPage(pageNumber: number) {
+        console.log('==========> shouldDrawOnPage:', this.name);
+        if(this._pageSequence == 'content') {
+            console.log('=====> content!');
+            if(this._pageContent == 'flow') {
+                console.log('=====> flow!');
+                console.log(`shouldDrawOnPage returns: ${!this._contentDone}`);
+                return !this._contentDone;
+            }            
+            return true;
+        } else if(this._pageSequence instanceof Array) {
+            // console.log('shouldDrawOnPage:', pageNumber, this._pageSequence);
+            if(this._pageSequence.includes(pageNumber)) {
+                console.log('shouldDrawOnPage returns: true');
+                return true;
+            }
+        } else if(typeof this._pageSequence == 'string') {
+            throw new Error('not yet implemented');
+        } else {
+            throw new Error('unknown page sequence type');
+        }
+
+        console.log('shouldDrawOnPage returns: false');
+        return false;
+    }
+
+    /**
+     * determines if there are any pages left for us to draw on
+     * 
+     * @return {boolean} whether or not we still need to draw on more pages
+     */
+    get doneDrawing(): boolean {
+        // console.log('&&& doneDrawing:', this.name);
+        if(this._pageSequence == 'content') {
+            if(this._pageContent == 'flow') {
+                return this._contentDone;
+            }            
+            return true;
+        } else if(this._pageSequence instanceof Array) {
+            if(this._pageNumber <= Math.max(...this._pageSequence)) {
+                return false;
+            }
+        } else if(typeof this._pageSequence == 'string') {
+            throw new Error('not yet implemented');
+        } else {
+            throw new Error('unknown page sequence type');
+        }
+
+        return true;
+    }
+
+    protected get _contentDone(): boolean {
+        throw new Error(`only views that suport content = flow should implemnt this: ${this.name} ${this._pageContent}`);
     }
 
     get leftMargin(): number {
@@ -131,6 +200,11 @@ export class View {
     }
 
     getContentHeightForWidth(context: Context, width: number): number {
+        // console.log('getContentHeightForWidth ', this.name);
+        if(!this.shouldDrawOnPage(this._pageNumber)) {
+            console.log('getContentHeightForWidth:', 'return 0');
+            return 0;
+        }
         if(this._cacheContentHeights && this._contentHeightCache[width]) {
             return this._contentHeightCache[width];
         }
@@ -138,33 +212,64 @@ export class View {
         return this._contentHeightCache[width];
     }
 
-    _getContentHeightForWidth(context: Context, width: number): number {
+    protected _getContentHeightForWidth(context: Context, width: number): number {
         return this.frame.height;
     }
 
     layoutSubviews(context: Context) {
+        console.log('layoutSubviews ', this.name);
+        this._pagesubs = [];
         for(let subview of this.subviews) {
             subview.calculateAbsoluteFrameFromParent();
+            this._pagesubs.push(subview);
+            // console.log(subview.name, subview.absoluteFrame);
         }
     }
 
     layoutAll(context: Context) {
+        console.log('=> layoutAll ', this.name);
         this.layoutSubviews(context);
-        for(let subview of this.subviews) {
+        for(let subview of this._pagesubs) {
             subview.layoutAll(context);
         }
     }
 
-    drawAll(context: Context) {
+    protected drawAll(context: Context): boolean {
+        console.log('=> drawAll', this.name, this._pageNumber);
+        if(!this.shouldDrawOnPage(this._pageNumber)) {
+            // console.log('should not draw on this page', this.name);
+            this._pageNumber++;
+            return this.doneDrawing;
+        }
+        let subsDone = true;
+        if(this._clip) {
+            // console.log('clip frames:', this.name, this.frame, this.absoluteFrame);
+            context.save();
+            context.rect(0, 0, this.frame.width, this.frame.height)
+            .clip();
+        }
         this.drawSelf(context);
-        this.subviews.forEach((subview) => {
+        for(const subview of this._pagesubs) {
             context.setOrigin(subview.absoluteFrame.left, subview.absoluteFrame.top);
-            subview.draw(context);
-        });
+            // console.log('about to drawAll ', subview.name);
+            const subDone = subview.drawAll(context);
+            // console.log('subDone:', this.name, subview.name, subDone);
+            if(!subview.doneDrawing) {
+                // console.log('drawAll -> doneDrawing:', this.name, subview.name, subview.doneDrawing);
+                subsDone = false;
+            }
+        }
+        if(this._clip) {
+            context.restore();
+        }
+        this._pageNumber++;
+        return subsDone;
     }
 
-    draw(context: Context) {
+    draw(context: Context): boolean {
+        // console.log('==> drawing single page', this.name);
         this.layoutAll(context);
         this.drawAll(context);
+        return this.doneDrawing;
     }
 }

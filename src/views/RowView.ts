@@ -44,6 +44,7 @@ export class RowView extends View {
             newFrame.left = curx;
             subview.setFrameWithRect(newFrame);
             curx += subview.getFrame().width;
+            this._pagesubs.push(subview);
         }
     }
 }

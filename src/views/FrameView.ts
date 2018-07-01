@@ -13,6 +13,7 @@ export class FrameView extends View {
     horizontalAlignment = HorizontalAlignment.Left;
     verticalAlignment = VerticalAlignment.Top;
     backgroundColor: string | null = null;
+    useSubviewContentHeights: boolean = true;
 
     static fromDesc(desc: FrameDesc): FrameView {
         let frameView = new FrameView();
@@ -51,6 +52,13 @@ export class FrameView extends View {
         if(desc.rightSide) { this.rightSide.setDescFields(desc.rightSide); }
         if(desc.bottomSide) { this.bottomSide.setDescFields(desc.bottomSide); }
         if(desc.backgroundColor) { this.backgroundColor = desc.backgroundColor; }
+        if(desc.useSubviewContentHeights != undefined) { this.useSubviewContentHeights = desc.useSubviewContentHeights; }
+    }
+
+    get _contentDone(): boolean {
+        return this.subviews.reduce((acc, curVal) => {
+            return acc && (<any>curVal)._contentDone;
+        }, true);
     }
 
     _getContentHeightForWidth(context: Context, width: number): number {
@@ -66,11 +74,20 @@ export class FrameView extends View {
     }
 
     layoutSubviews(context: Context) {
+        console.log('layoutSubviews ', this.name);
+        this._pagesubs = [];
         const innerHeight = this.frame.height - (this.topSide.thickness + this.bottomSide.thickness);
         for(let subview of this.subviews) {
             let newFrame = subview.getFrame();
             newFrame.width = this.frame.width - (this.leftSide.thickness + this.rightSide.thickness);
-            newFrame.height = subview.getContentHeightForWidth(context, newFrame.width);
+            // console.log('this.useSubviewContentHeights:', this.name, this.useSubviewContentHeights);
+            if(this.useSubviewContentHeights) {
+                newFrame.height = subview.getContentHeightForWidth(context, newFrame.width);
+            } else {
+                newFrame.height = this.frame.height - (this.topSide.thickness + this.bottomSide.thickness);
+                // console.log('newFrame.height:', newFrame.height);
+            }
+            
             // console.error('layoutSubviews:', this.frame.height, newFrame.height);
             // if(this.horizontalAlignment == HorizontalAlignment.Left) {
             //     newFrame.left = this.topSide.thickness;
@@ -87,6 +104,7 @@ export class FrameView extends View {
             }
             newFrame.left = this.leftSide.thickness;
             subview.setFrameWithRect(newFrame);
+            this._pagesubs.push(subview);
         }
     }
 
