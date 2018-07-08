@@ -12,7 +12,7 @@ export class TextRun {
     public words: string[];
 
     constructor(text: string) {
-        this.setText(text);
+        this.setText(text || '');
         this.style = new TextStyle();
     }
 
