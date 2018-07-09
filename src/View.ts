@@ -10,16 +10,19 @@ export interface HeightCache {
 export class View {
 
     private parent: View | null = null;
-    protected subviews: View[] = [];
+    public subviews: View[] = [];
     protected frame: Rect;
     protected absoluteFrame: Rect;
     public name: string = 'unnamed';
-    protected _debugOutlineColor: string | null;
+    public _debugOutlineColor: string | null;
     private _cacheContentHeights = true;
     private _contentHeightCache: HeightCache = {};
 
     constructor() {
+        this.frame = new Rect();
+        this.absoluteFrame = new Rect();
         this.setFrameWithRect(new Rect());
+        this._debugOutlineColor = null;
     }
 
     static fromDesc(desc: ViewDesc): View {
