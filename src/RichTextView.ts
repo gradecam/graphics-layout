@@ -16,7 +16,6 @@ export interface LineCache {
     [width: number]: TextLine[];
 }
 
-
 export class RichTextView extends View {
     private textRuns: TextRun[] = [];
     public alignment: HorizontalAlignment = HorizontalAlignment.Left;

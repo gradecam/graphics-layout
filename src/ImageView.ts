@@ -5,7 +5,7 @@ import {Context} from './Context';
 
 export class ImageView extends View {
 
-    filename: string;
+    filename: string = '';
 
     static fromDesc(desc: ImageDesc): ImageView {
         let imageView = new ImageView();
