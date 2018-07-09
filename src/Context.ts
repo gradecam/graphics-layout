@@ -33,6 +33,7 @@ export abstract class Context {
     // abstract extractFontMetrics(): void;
     abstract get allFontNames(): string[];
     abstract moveTo(x: number, y: number): Context;
+    abstract lineTo(x: number, y: number): Context;
     abstract lineWidth(width: number): Context;
     abstract roundedRect(left: number, top: number, width: number, height: number, borderRadius: number): Context;
     abstract rect(left: number, top: number, width: number, height: number): Context;

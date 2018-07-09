@@ -42,7 +42,14 @@ export class PdfKitContext extends Context {
     }
 
     moveTo(x: number, y: number): PdfKitContext {
+        ({x, y} = this.pointToOrigin(x, y));
         this.doc.moveTo(x, y);
+        return this;
+    }
+
+    lineTo(x: number, y: number): PdfKitContext {
+        ({x, y} = this.pointToOrigin(x, y));
+        this.doc.lineTo(x, y);
         return this;
     }
 
