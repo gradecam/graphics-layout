@@ -8,6 +8,7 @@ export interface TextStyleDesc {
     italics?: boolean;
     strikethrough?: boolean;
     underline?: boolean;
+    vshift?: number;
 }
 
 export interface TextRunDesc {

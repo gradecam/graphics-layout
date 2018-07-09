@@ -5,11 +5,10 @@ import {TextRunDesc} from './ViewDescriptions';
 
 export class TextRun {
     public style: TextStyle;
-    public ascender: number;
-    public descender: number;
+    public ascender: number = 0;
+    public descender: number = 0;
     public lastWordToBeContinued = false;
-    // private words: string[]; FIXME: this should actually be private
-    public words: string[];
+    public words: string[] = [];
 
     constructor(text: string) {
         this.setText(text || '');
@@ -67,17 +66,16 @@ export class TextRun {
     }
 
      draw(context: Context, left: number, top: number): number {
-        //  console.error('TextRun::draw:', left, top);
-         context.font(context.fontToFullFontName(this.style.font, this.style.bold, this.style.italics));
-         context.fontSize(this.style.fontSize);
-         context.fillColor(this.style.color);
-         const textToDraw = this.words.join(' ');
-         context.drawText(textToDraw, left, top, {
-             underline: this.style.underline,
-             strike: this.style.strikethrough,
-             lineBreak: false
-         });
-         const endSpace = this.lastWordToBeContinued ? '' : ' ';
-         return context.widthOfText(textToDraw + endSpace);
+        context.font(context.fontToFullFontName(this.style.font, this.style.bold, this.style.italics));
+        context.fontSize(this.style.fontSize);
+        context.fillColor(this.style.color);
+        const textToDraw = this.words.join(' ');
+        context.drawText(textToDraw, left, top + this.style.fontSize * this.style.vshift, {
+            underline: this.style.underline,
+            strike: this.style.strikethrough,
+            lineBreak: false
+        });
+        const endSpace = this.lastWordToBeContinued ? '' : ' ';
+        return context.widthOfText(textToDraw + endSpace);
      }
 }
