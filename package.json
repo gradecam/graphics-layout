@@ -26,8 +26,8 @@
     "@types/css": "0.0.30",
     "@types/htmlparser2": "^3.7.30",
     "@types/pdfkit": "~0.7.35",
-    "typescript": "~2.5.2",
-    "tslint": "~5.7.0"
+    "tslint": "~5.7.0",
+    "typescript": "^2.9.2"
   },
   "engines": {
     "node": ">= 6"
