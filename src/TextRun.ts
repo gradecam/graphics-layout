@@ -11,7 +11,7 @@ export class TextRun {
     public words: string[] = [];
 
     constructor(text: string) {
-        this.setText(text || '');
+        this.setText(text);
         this.style = new TextStyle();
     }
 
@@ -23,6 +23,7 @@ export class TextRun {
     }
 
     setText(text: string): TextRun {
+        text = text ? text.toString() : '';
         const isNonBreakingSpace = text == "\u00A0";
         if(isNonBreakingSpace) {
             this.words = [text];

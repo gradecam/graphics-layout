@@ -20,7 +20,7 @@ import {
     // printDescTree
 } from '../ViewDescriptions';
 import {Factory} from '../Factory';
-import {View} from '../View';
+import {View} from '../views';
 import {HorizontalAlignment} from '../Alignment';
 
 // internal imports

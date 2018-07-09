@@ -1,10 +1,12 @@
 import {ViewDesc} from './ViewDescriptions';
-import {View} from './View';
-import {RichTextView} from './RichTextView';
-import {ColumnView} from './ColumnView';
-import {FrameView} from './FrameView';
-import {ImageView} from './ImageView';
-import {RowView} from './RowView';
+import {
+    View,
+    ColumnView,
+    FrameView,
+    ImageView,
+    RichTextView,
+    RowView
+} from './views';
 
 interface ViewConstructor {
     new(): View;

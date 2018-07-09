@@ -12,9 +12,9 @@ export {
     AnyView,
     TextStyleDesc
 } from './ViewDescriptions';
-export {View} from './View';
+export {View} from './views';
 export {HorizontalAlignment, VerticalAlignment} from './Alignment';
-export {FrameView} from './FrameView';
+export {FrameView} from './views/FrameView';
 export {renderHtml, HtmlRenderOpts, FontSelector, CssSelectorMap, CssValuePart} from './HtmlRenderer';
 export {Point} from './Context';
 export { PDFDocument };

@@ -1,6 +1,6 @@
 import {View} from './View';
-import {Context} from './Context';
-import {RowDesc} from './ViewDescriptions';
+import {Context} from '../Context';
+import {RowDesc} from '../ViewDescriptions';
 
 export class RowView extends View {
     public fitHorizontal = true;
