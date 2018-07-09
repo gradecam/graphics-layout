@@ -54,7 +54,7 @@ export interface RowDesc extends ViewDesc {
 
 export interface FrameSideDesc {
     margin?: number;
-    border?: number;
+    borderWidth?: number;
     borderColor?: string;
     padding?: number;
 }
