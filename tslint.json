@@ -50,7 +50,7 @@
     "no-var-keyword": true,
     "no-var-requires": true,
     "one-line": [ true, "check-open-brace", "check-whitespace" ],
-    "only-arrow-functions": [ true, "allow-declarations", "allow-named-functions" ],
+    "only-arrow-functions": false,
     "radix": true,
     "semicolon": [true, "always"],
     "switch-default": true,
