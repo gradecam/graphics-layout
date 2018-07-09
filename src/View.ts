@@ -162,7 +162,8 @@ export class View {
         this.drawSelf(context);
         this.subviews.forEach((subview) => {
             context.setOrigin(subview.absoluteFrame.left, subview.absoluteFrame.top);
-            subview.draw(context);
+            // subview.draw(context);
+            subview.drawAll(context);
         });
     }
 
