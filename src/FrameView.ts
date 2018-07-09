@@ -132,7 +132,7 @@ export class FrameView extends View {
             if(stroke) {
                 // FIXME: this is how we're handling things if the line changes width between sides. It looks terrible though.
                 //        compare to how it looks in a browser. the corners are all wrong. we probably needs to do something with
-                //         the end caps in order to make it right
+                //        the end caps in order to make it right
                 context.lineWidth(width).strokeColor(color).lineTo(x, y).stroke().moveTo(x, y);
             } else {
                 context.lineWidth(width).strokeColor(color).lineTo(x, y);
