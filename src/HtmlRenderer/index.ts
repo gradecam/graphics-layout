@@ -1,8 +1,16 @@
+// exports
+export {
+    FontSelector,
+    CssSelectorMap,
+    CssValuePart
+} from './utils';
+
+// node modules
 import * as htmlparser from 'htmlparser2';
 import * as css from 'css';
 import * as parseCssValue from 'css-value';
-// import * as juice from 'juice';
 
+// dependencies in graphics-layout
 import {
     ViewDesc,
     RichTextDesc,
@@ -10,10 +18,23 @@ import {
     FrameDesc,
     TextRunDesc,
     // printDescTree
-} from './ViewDescriptions';
-import {Factory} from './Factory';
-import {View} from './View';
-import {HorizontalAlignment} from './Alignment';
+} from '../ViewDescriptions';
+import {Factory} from '../Factory';
+import {View} from '../View';
+import {HorizontalAlignment} from '../Alignment';
+
+// internal imports
+import {
+    convertCssUnitToPoints,
+    CssPropertyMap,
+    CssSelectorMap,
+    FontSelector,
+    InheritedStyle,
+    SimpleCssDeclaration
+} from './utils';
+import {cssTextDeclarationHandlers} from './cssTextDeclarationHandlers';
+import {cssFrameDeclarationHandlers} from './cssFrameDeclarationHandlers';
+import {cssShorthandExpansionMap} from './cssShorthandExpansionMap';
 
 const userAgentStyleSheet = `
 p  {
@@ -59,6 +80,14 @@ h6 {
 b, strong {
     font-weight: bold;
 }
+sub {
+    vertical-align: sub;
+    font-size: smaller;
+}
+sup {
+    vertical-align: super;
+    font-size: smaller;
+}
 i, em, address {
     font-style: italic;
 }
@@ -70,95 +99,6 @@ s, strike, del {
 }
 `;
 
-interface SimpleCssDeclaration {
-    property: string;
-    value: CssValuePart;
-}
-
-
-type CssTextPropertyHandler = (value: CssValuePart, style: InheritedStyle, emSize: number) => void;
-interface CssTextPropertyHandlerMap {
-    [propertyName: string]: CssTextPropertyHandler;
-}
-
-const cssTextDeclarationHandlers: CssTextPropertyHandlerMap = {
-    'font-family': (part: CssValuePart, style: InheritedStyle, emSize: number) => {
-        style.font = part.string;
-    },
-    'font-size': (part: CssValuePart, style: InheritedStyle, emSize: number) => {
-        style.fontSize = convertCssUnitToPoints(part, emSize);
-    },
-    'font-style': (part: CssValuePart, style: InheritedStyle, emSize: number) => {
-        if(part.string == 'italic' || part.string == 'oblique') {
-            style.italics = true;
-        }
-    },
-    'font-weight': (part: CssValuePart, style: InheritedStyle, emSize: number) => {
-        if(part.string == 'bold') {
-            style.bold = true;
-        }
-    },
-    'text-decoration': (part: CssValuePart, style: InheritedStyle, emSize: number) => {
-        if(part.string == 'underline') {
-            style.underline = true;
-        } else if(part.string == 'line-through') {
-            style.strikethrough = true;
-        }
-    },
-    'color': (part: CssValuePart, style: InheritedStyle, emSize: number) => {
-        style.color = part.string;
-    },
-    'text-align': (part: CssValuePart, style: InheritedStyle, emSize: number) => {
-        let newAlignment = HorizontalAlignment.Left;
-        if(part.string == 'center') {
-            newAlignment = HorizontalAlignment.Center;
-        } else if(part.string == 'right') {
-            newAlignment = HorizontalAlignment.Right;
-        }
-        style.textAlignment = newAlignment;
-    }
-};
-
-type CssFramePropertyHandler = (value: CssValuePart, frameViewDesc: FrameDesc, emSize: number) => void;
-interface CssFramePropertyHandlerMap {
-    [propertyName: string]: CssFramePropertyHandler;
-}
-
-const cssFrameDeclarationHandlers: CssFramePropertyHandlerMap = {
-    'padding-top': (value: CssValuePart, frameViewDesc: FrameDesc, emSize: number) => {
-        if(!frameViewDesc.topSide) { frameViewDesc.topSide = {};}
-        frameViewDesc.topSide.padding = convertCssUnitToPoints(value, emSize);
-    },
-    'padding-bottom': (value: CssValuePart, frameViewDesc: FrameDesc, emSize: number) => {
-        if(!frameViewDesc.bottomSide) { frameViewDesc.bottomSide = {};}
-        frameViewDesc.bottomSide.padding = convertCssUnitToPoints(value, emSize);
-    },
-    'padding-left': (value: CssValuePart, frameViewDesc: FrameDesc, emSize: number) => {
-        if(!frameViewDesc.leftSide) { frameViewDesc.leftSide = {};}
-        frameViewDesc.leftSide.padding = convertCssUnitToPoints(value, emSize);
-    },
-    'padding-right': (value: CssValuePart, frameViewDesc: FrameDesc, emSize: number) => {
-        if(!frameViewDesc.rightSide) { frameViewDesc.rightSide = {};}
-        frameViewDesc.rightSide.padding = convertCssUnitToPoints(value, emSize);
-    },
-    'margin-top': (value: CssValuePart, frameViewDesc: FrameDesc, emSize: number) => {
-        if(!frameViewDesc.topSide) { frameViewDesc.topSide = {};}
-        frameViewDesc.topSide.margin = convertCssUnitToPoints(value, emSize);
-    },
-    'margin-bottom': (value: CssValuePart, frameViewDesc: FrameDesc, emSize: number) => {
-        if(!frameViewDesc.bottomSide) { frameViewDesc.bottomSide = {};}
-        frameViewDesc.bottomSide.margin = convertCssUnitToPoints(value, emSize);
-    },
-    'margin-left': (value: CssValuePart, frameViewDesc: FrameDesc, emSize: number) => {
-        if(!frameViewDesc.leftSide) { frameViewDesc.leftSide = {};}
-        frameViewDesc.leftSide.margin = convertCssUnitToPoints(value, emSize);
-    },
-    'margin-right': (value: CssValuePart, frameViewDesc: FrameDesc, emSize: number) => {
-        if(!frameViewDesc.rightSide) { frameViewDesc.rightSide = {};}
-        frameViewDesc.rightSide.margin = convertCssUnitToPoints(value, emSize);
-    }
-};
-
 const containerTags = [
     'p', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
     'address', 'article', 'aside', 'div', 'footer', 'header', 'hgroup', 'layer', 'main', 'nav', 'section'
@@ -167,22 +107,15 @@ function isContainerTag(tagName: string): boolean {
     return containerTags.indexOf(tagName) != -1;
 }
 
-const styleTags = ['b', 'strong', 'i', 'em', 'u', 'ins', 's', 'strike', 'del', 'span'];
+const styleTags = ['b', 'strong', 'i', 'em', 'u', 'ins', 's', 'strike', 'del', 'span', 'sub', 'sup'];
 function isStyleTag(tagName: string): boolean {
     return styleTags.indexOf(tagName) != -1;
-}
-
-export interface CssPropertyMap {
-    [property: string]: CssValuePart;
-}
-
-export interface CssSelectorMap {
-    [selector: string]: CssPropertyMap;
 }
 
 function cssStringToSelectorMap(cssString: string, fontSelector?: FontSelector): CssSelectorMap {
 
     const stylesheet = css.parse(cssString).stylesheet;
+    // console.log({stylesheet});
     const selectorMap: CssSelectorMap = {};
     if(stylesheet && stylesheet.rules) {
 
@@ -213,7 +146,11 @@ function cssStringToSelectorMap(cssString: string, fontSelector?: FontSelector):
                 // parse the css value string
                 let cssValueParts: CssValuePart[] = [];
                 try {
-                    cssValueParts = parseCssValue(declaration.value);
+                    if(declaration.value.match(/^#[A-F0-9]{3}$|^#[A-F0-9]{6}$/)) {
+                        cssValueParts = <any>[{ type: 'ident', string: declaration.value }];
+                    } else {
+                        cssValueParts = parseCssValue(declaration.value);
+                    }
                 }
                 catch(e) {
                     console.warn(`CSS Parse Error. Style '${declaration.property}' will not be rendered`);
@@ -274,91 +211,6 @@ function getMatchingDeclarations(
     return newPropertyMap;
 }
 
-function convertCssUnitToPoints(value: CssValuePart, emSize: number) {
-    const unitConversionMap: {[unit: string]: number} = {
-        'pt': 1,
-        'px': 3/4,
-        'in': 72,
-        'cm':  72.0/2.54,
-        'mm':  72.0/25.4,
-        'pc': 12
-    };
-    value.unit = value.unit == '' ? 'pt' : value.unit;
-    let multiplier = 1;
-    if(unitConversionMap[value.unit]) {
-        multiplier = unitConversionMap[value.unit];
-    } else if(value.unit == 'em') {
-        multiplier = emSize;
-    }
-    return value.value * multiplier;
-}
-
-type CssShorthandExpansion = (parts: CssValuePart[]) => SimpleCssDeclaration[];
-interface CssShorthandExpansionMap {
-    [property: string]: CssShorthandExpansion;
-}
-
-const cssShorthandExpansionMap: CssShorthandExpansionMap = {
-    'border': (parts: CssValuePart[]): SimpleCssDeclaration[] => {
-        const borderStyleValues = [
-            'none', 'hidden', 'dotted', 'dashed', 'solid', 'double', 'groove', 'ridge', 'inset', 'outset', 'initial', 'inherit'
-        ];
-        let simpleDeclarations: SimpleCssDeclaration[] = [];
-        for(let i = 0; i < 3; i++) {
-            if(parts[i] && parts[i].type == 'number') {
-                simpleDeclarations.push({property: 'border-width', value: parts[i]});
-            } else if(parts[i] && borderStyleValues.indexOf(parts[i].string) != -1) {
-                simpleDeclarations.push({property: 'border-style', value: parts[i]});
-            } else if(parts[i] && parts[i].type == 'ident') {
-                simpleDeclarations.push({property: 'border-color', value: parts[i]});
-            }
-        }
-        return simpleDeclarations;
-    },
-    'border-style': (parts: CssValuePart[]): SimpleCssDeclaration[] => {
-        return CssSideExpansion('border', 'style', parts);
-    },
-    'border-width': (parts: CssValuePart[]): SimpleCssDeclaration[] => {
-        return CssSideExpansion('border', 'width', parts);
-    },
-    'border-color': (parts: CssValuePart[]): SimpleCssDeclaration[] => {
-        return CssSideExpansion('border', 'color', parts);
-    },
-    'margin': (parts: CssValuePart[]): SimpleCssDeclaration[] => {
-        return CssSideExpansion('margin', '', parts);
-    },
-    'padding': (parts: CssValuePart[]): SimpleCssDeclaration[] => {
-        return CssSideExpansion('padding', '', parts);
-    },
-};
-
-function CssSideExpansion(propertyPrefix: string, propertySuffix: string, parts: CssValuePart[]): SimpleCssDeclaration[] {
-    let simpleDeclarations: SimpleCssDeclaration[] = [];
-    propertySuffix = propertySuffix != '' ? `-${propertySuffix}` : '';
-    if(parts.length == 1) {
-        simpleDeclarations.push({property: `${propertyPrefix}-top${propertySuffix}`, value: parts[0]});
-        simpleDeclarations.push({property: `${propertyPrefix}-right${propertySuffix}`, value: parts[0]});
-        simpleDeclarations.push({property: `${propertyPrefix}-bottom${propertySuffix}`, value: parts[0]});
-        simpleDeclarations.push({property: `${propertyPrefix}-left${propertySuffix}`, value: parts[0]});
-    } else if(parts.length == 2) {
-        simpleDeclarations.push({property: `${propertyPrefix}-top${propertySuffix}`, value: parts[0]});
-        simpleDeclarations.push({property: `${propertyPrefix}-bottom${propertySuffix}`, value: parts[0]});
-        simpleDeclarations.push({property: `${propertyPrefix}-left${propertySuffix}`, value: parts[1]});
-        simpleDeclarations.push({property: `${propertyPrefix}-right${propertySuffix}`, value: parts[1]});
-    } else if(parts.length == 3) {
-        simpleDeclarations.push({property: `${propertyPrefix}-top${propertySuffix}`, value: parts[0]});
-        simpleDeclarations.push({property: `${propertyPrefix}-right${propertySuffix}`, value: parts[1]});
-        simpleDeclarations.push({property: `${propertyPrefix}-left${propertySuffix}`, value: parts[1]});
-        simpleDeclarations.push({property: `${propertyPrefix}-bottom${propertySuffix}`, value: parts[2]});
-    } else if(parts.length == 4) {
-        simpleDeclarations.push({property: `${propertyPrefix}-top${propertySuffix}`, value: parts[0]});
-        simpleDeclarations.push({property: `${propertyPrefix}-right${propertySuffix}`, value: parts[1]});
-        simpleDeclarations.push({property: `${propertyPrefix}-bottom${propertySuffix}`, value: parts[2]});
-        simpleDeclarations.push({property: `${propertyPrefix}-left${propertySuffix}`, value: parts[3]});
-    }
-    return simpleDeclarations;
-}
-
 // FIXME: expandCssShorthand and expandCssShorthand2 should probably just be one recursive function
 function expandCssShorthand(property: string, parts: CssValuePart[]): SimpleCssDeclaration[] {
     if(!cssShorthandExpansionMap[property]) {
@@ -379,19 +231,6 @@ function expandCssShorthand2(property: string, part: CssValuePart): SimpleCssDec
     return cssShorthandExpansionMap[property]([part]);
 }
 
-export interface InheritedStyle {
-    font: string;
-    fontSize: number;
-    color: string;
-    bold: boolean;
-    italics: boolean;
-    strikethrough: boolean;
-    underline: boolean;
-    textAlignment: HorizontalAlignment;
-    displayNone: boolean;
-}
-
-
 let textCount = 0;
 
 export interface HtmlRenderOpts {
@@ -400,8 +239,6 @@ export interface HtmlRenderOpts {
 }
 
 interface TagAttributes { [type: string]: string; }
-
-export type FontSelector = (fontFamilyNames: string[]) => string;
 
 const userAgentSelectorMap = cssStringToSelectorMap(userAgentStyleSheet);
 
@@ -438,6 +275,7 @@ export function renderHtml(
         italics: false,
         strikethrough: false,
         underline: false,
+        vshift: 0,
         textAlignment: HorizontalAlignment.Left,
         displayNone: false
     }];
@@ -452,7 +290,8 @@ export function renderHtml(
             let matchingDeclarations = getMatchingDeclarations(
                 cssSelectorMap,
                 tagName,
-                attribs.id || undefined, parseCssClassTag(attribs.class || '') || undefined
+                attribs.id || undefined,
+                parseCssClassTag(attribs.class || '') || undefined
             );
             let combinedDeclarations = matchingDeclarations;
             if(attribs.style) {
@@ -477,7 +316,9 @@ export function renderHtml(
                 lastTextRun = null;
                 lastTextRunHasTrailingWhiteSpace = false;
             } else if(isStyleTag(tagName)) {
+                // console.log({tagName});
                 handleStyleTag(tagName, combinedDeclarations, attribs, newStyle);
+                // console.log({newStyle});
             } else {
                 // handle <br> as a special case, ignore anything we don't regcognize (should we treat them all as generic containers?)
                 if(tagName == 'br') {
@@ -529,7 +370,9 @@ export function renderHtml(
                     if(!currentContainer.subviews) { currentContainer.subviews = []; }
                     currentContainer.subviews.push(currentParagraph);
                 }
+                // console.log({text, topStyle});
                 let newRun: TextRunDesc = {text: text, style: topStyle};
+                // console.log(newRun);
                 currentParagraph.runs.push(newRun);
                 lastTextRun = newRun;
                 lastTextRunHasTrailingWhiteSpace = hasTrailingWhiteSpace;
@@ -555,7 +398,7 @@ export function renderHtml(
                 lastTextRun = null;
             } else if(isStyleTag) {
             } else {
-                ; // just ignore any tags that we don't regcognize (this needs to mirror the behavior of onopentag)
+                // just ignore any tags that we don't regcognize (this needs to mirror the behavior of onopentag)
             }
             styleStack.pop();
         }
@@ -566,6 +409,15 @@ export function renderHtml(
     // printDescTree(rootContainer);
     let generatedViewTree = Factory(rootContainer);
     superView.addSubview(generatedViewTree);
+}
+
+function printDescTree(rootView: ViewDesc, depth: number = 0) {
+    // JSON.stringify(rootView, null, 4);
+    console.log("  ".repeat(depth) + `{${rootView.type}}`);
+    if(!rootView.subviews) { return; }
+    for(const sub of rootView.subviews) {
+        printDescTree(sub, depth + 1);
+    }
 }
 
 interface ContainerLayer {
@@ -661,6 +513,7 @@ function cloneStyle(style: InheritedStyle): InheritedStyle {
         italics: style.italics,
         underline: style.underline,
         strikethrough: style.strikethrough,
+        vshift: style.vshift,
         textAlignment: style.textAlignment,
         displayNone: style.displayNone
     };
