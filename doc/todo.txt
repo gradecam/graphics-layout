@@ -1,0 +1,19 @@
+- performance
+    - TextStyles.ts
+        - a large text document could require a lot of styles and that could use a lot of memory/CPU
+            - try to do some profiling to see how much it's actually impacting performance
+            - investigate how much style re-use you could do in order to reduce resource usage
+            - investigate if making some attributes optional, where undefined = the default improves things
+- css
+    - extract all style tags before doing any other parsing and combine them with the styles from the user agent style sheet
+    - support more css selectors
+        - class
+        - id
+        - [selector] [selector]
+        - [selector] > [selector]
+    - abstract out the css libraries we are working
+        - define all of our own data structures
+        - defined all the the functions that we need
+        - wrap the node modules that we are using in those functions
+        - make sure they return our data structures
+        - add useCssProcessor so that different processors can be plugged in
