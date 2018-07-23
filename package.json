@@ -7,8 +7,9 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc --project .",
-    "dev": "tsc --watch --project .",
+    "build": "tsc --project .; cp src/HtmlRenderer/UserAgent.css dist/HtmlRenderer/",
+    "watch": "tsc --watch --project .",
+    "clean": "rm -Rf dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
