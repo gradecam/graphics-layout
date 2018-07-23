@@ -1,4 +1,4 @@
-import {FrameSideDesc} from './ViewDescriptions';
+import { FrameSideDesc } from '../ViewDescriptions';
 
 export class FrameSide {
     margin = 0;

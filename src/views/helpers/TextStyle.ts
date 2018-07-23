@@ -1,4 +1,4 @@
-import {TextStyleDesc} from './ViewDescriptions';
+import { TextStyleDesc } from '../ViewDescriptions';
 
 export class TextStyle {
     // FIXME: a large text document could require a lot of styles and that could use a lot of memory/CPU

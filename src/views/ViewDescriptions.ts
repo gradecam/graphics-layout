@@ -1,21 +1,4 @@
-import {VerticalAlignment, HorizontalAlignment} from './Alignment';
-
-export interface TextStyleDesc {
-    fontSize?: number;
-    font?: string;
-    color?: string;
-    bold?: boolean;
-    italics?: boolean;
-    strikethrough?: boolean;
-    underline?: boolean;
-    vshift?: number;
-}
-
-export interface TextRunDesc {
-    text: string;
-    style?: TextStyleDesc;
-    lastWordToBeContinued?: boolean;
-}
+import {VerticalAlignment, HorizontalAlignment} from './helpers';
 
 export type AnyView =
     RichTextDesc |
@@ -32,8 +15,9 @@ export interface ViewDesc {
     top?: number;
     width?: number;
     height?: number;
+    fixedWidth?: number;
     parent?: ViewDesc;
-    subviews?: Array<AnyView>;
+    subviews?: AnyView[];
     _debugOutlineColor?: string;
 }
 
@@ -75,4 +59,21 @@ export interface FrameDesc extends ViewDesc {
 export interface ImageDesc extends ViewDesc {
     type: 'Image';
     filename: string;
+}
+
+export interface TextStyleDesc {
+    fontSize?: number;
+    font?: string;
+    color?: string;
+    bold?: boolean;
+    italics?: boolean;
+    strikethrough?: boolean;
+    underline?: boolean;
+    vshift?: number;
+}
+
+export interface TextRunDesc {
+    text: string;
+    style?: TextStyleDesc;
+    lastWordToBeContinued?: boolean;
 }

@@ -1,7 +1,7 @@
+import {Context} from '../../contexts';
+import {TextRunDesc} from '../ViewDescriptions';
 import {TextStyle} from './TextStyle';
 import {Word} from './Word';
-import {Context} from './Context';
-import {TextRunDesc} from './ViewDescriptions';
 
 export class TextRun {
     public style: TextStyle;

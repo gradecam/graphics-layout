@@ -1,5 +1,5 @@
-import {Context} from './Context';
-import {TextStyle} from './TextStyle';
+import { Context } from '../../contexts';
+import { TextStyle } from './TextStyle';
 
 export class Word {
     public parts: WordPart[];
