@@ -1,19 +1,12 @@
 // internal imports
-import {
-    convertCssUnitToPoints,
-    CssPropertyMap,
-    CssSelectorMap,
-    FontSelector,
-    InheritedStyle,
-    SimpleCssDeclaration
-} from './utils';
+import {SimpleCssDeclaration} from './interfaces';
 
-export type CssShorthandExpansion = (parts: CssValuePart[]) => SimpleCssDeclaration[];
-export interface CssShorthandExpansionMap {
+type CssShorthandExpansion = (parts: CssValuePart[]) => SimpleCssDeclaration[];
+interface CssShorthandExpansionMap {
     [property: string]: CssShorthandExpansion;
 }
 
-export const cssShorthandExpansionMap: CssShorthandExpansionMap = {
+const cssShorthandExpansionMap: CssShorthandExpansionMap = {
     'border': (parts: CssValuePart[]): SimpleCssDeclaration[] => {
         const borderStyleValues = [
             'none', 'hidden', 'dotted', 'dashed', 'solid', 'double', 'groove', 'ridge', 'inset', 'outset', 'initial', 'inherit'
@@ -74,4 +67,24 @@ function CssSideExpansion(propertyPrefix: string, propertySuffix: string, parts:
     }
     // console.log(JSON.stringify({simpleDeclarations}, null, 4));
     return simpleDeclarations;
+}
+
+// FIXME: expandCssShorthand and expandCssShorthand2 should probably just be one recursive function
+export function expandCssShorthand(property: string, parts: CssValuePart[]): SimpleCssDeclaration[] {
+    if(!cssShorthandExpansionMap[property]) {
+        if(parts.length > 1) { console.warn('css property with no expansions has more than one value'); }
+        return [{property: property, value: parts[0]}];
+    }
+    const expandedDeclarations = cssShorthandExpansionMap[property](parts);
+    let allDeclarations: SimpleCssDeclaration[] = [];
+    for(const expandedDelaration of expandedDeclarations) {
+        const furtherExpanded = expandCssShorthand2(expandedDelaration.property, expandedDelaration.value);
+        allDeclarations = allDeclarations.concat(furtherExpanded);
+    }
+    return allDeclarations;
+}
+
+function expandCssShorthand2(property: string, part: CssValuePart): SimpleCssDeclaration[] {
+    if(!cssShorthandExpansionMap[property]) { return [{property: property, value: part}]; }
+    return cssShorthandExpansionMap[property]([part]);
 }

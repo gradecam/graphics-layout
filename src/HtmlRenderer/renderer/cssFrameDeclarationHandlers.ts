@@ -1,12 +1,5 @@
-// dependencies in graphics-layout
-import {
-    FrameDesc,
-} from '../ViewDescriptions';
-
-// internal imports
-import {
-    convertCssUnitToPoints
-} from './utils';
+import { FrameDesc } from '../../views';
+import { convertCssUnitToPoints } from '../css';
 
 // FIXME: this is identical to whats in cssTextDeclarationHandlers, combine them
 export type CssFramePropertyHandler = (value: CssValuePart, frameViewDesc: FrameDesc, emSize: number) => void;
@@ -15,6 +8,9 @@ export interface CssFramePropertyHandlerMap {
 }
 
 export const cssFrameDeclarationHandlers: CssFramePropertyHandlerMap = {
+    'width': (value: CssValuePart, frameViewDesc: FrameDesc, emSize: number) => {
+        frameViewDesc.fixedWidth = convertCssUnitToPoints(value, emSize);
+    },
     'padding-top': (value: CssValuePart, frameViewDesc: FrameDesc, emSize: number) => {
         if(!frameViewDesc.topSide) { frameViewDesc.topSide = {};}
         frameViewDesc.topSide.padding = convertCssUnitToPoints(value, emSize);
@@ -65,11 +61,7 @@ export const cssFrameDeclarationHandlers: CssFramePropertyHandlerMap = {
     },
     'border-top-color': (value: CssValuePart, frameViewDesc: FrameDesc, emSize: number) => {
         if(!frameViewDesc.topSide) { frameViewDesc.topSide = {};}
-        // console.log({frameViewDesc});
-        // console.log({a: 1});
         frameViewDesc.topSide.borderColor = value.string;
-        // console.log({a: 2});
-        // console.log({frameViewDesc});
     },
     'border-right-color': (value: CssValuePart, frameViewDesc: FrameDesc, emSize: number) => {
         if(!frameViewDesc.rightSide) { frameViewDesc.rightSide = {};}

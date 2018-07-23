@@ -1,12 +1,6 @@
-// dependencies in graphics-layout
-import {HorizontalAlignment} from '../Alignment';
-
-// internal imports
-import {
-    convertCssUnitToPoints,
-    InheritedStyle,
-    subSupParams
-} from './utils';
+import { HorizontalAlignment } from '../../views';
+import { convertCssUnitToPoints } from '../css';
+import { InheritedStyle, subSupParams } from './utils';
 
 // FIXME: this is identical to whats in cssFrameDeclarationHandlers, combine them into just CssPropertyHandler
 export type CssTextPropertyHandler = (value: CssValuePart, style: InheritedStyle, emSize: number) => void;
