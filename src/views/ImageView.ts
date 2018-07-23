@@ -1,7 +1,6 @@
-import {View, HeightCache} from './View';
-import {ImageDesc} from '../ViewDescriptions';
-import {Context} from '../Context';
-
+import { Context } from '../contexts';
+import { View } from './View';
+import { ImageDesc } from './ViewDescriptions';
 
 export class ImageView extends View {
 

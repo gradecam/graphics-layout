@@ -1,16 +1,7 @@
-import {Word} from '../Word';
-import {TextRun} from '../TextRun';
-import {TextStyle} from '../TextStyle';
-import {TextLine} from '../TextLine';
-import {Rect} from '../Rect';
-import {View, HeightCache} from './View';
-import {HorizontalAlignment} from '../Alignment';
-import {Context} from '../Context';
-import {
-    TextRunDesc,
-    TextStyleDesc,
-    RichTextDesc
-} from '../ViewDescriptions';
+import { Context } from '../contexts/Context';
+import { View } from './View';
+import { RichTextDesc } from './ViewDescriptions';
+import { Word, TextRun, TextLine, Rect, HorizontalAlignment } from './helpers';
 
 export interface LineCache {
     [width: number]: TextLine[];
@@ -20,7 +11,6 @@ export class RichTextView extends View {
     private textRuns: TextRun[] = [];
     public alignment: HorizontalAlignment = HorizontalAlignment.Left;
     public lineGap = 0;
-    // private heightCache: HeightCache = {};
     private lineCache: LineCache = {};
 
     static fromDesc(desc: RichTextDesc): RichTextView {
@@ -40,7 +30,7 @@ export class RichTextView extends View {
 
     constructor() {
         super();
-        // this._debugOutlineColor = 'green';
+        this._debugOutlineColor = null;
     }
 
     toJSON(): any {
@@ -79,6 +69,10 @@ export class RichTextView extends View {
 
         let words = this.breakTextRunsIntoGraphicWords(context);
         words.forEach( (word) => {
+            // FIXME: There are two options here:
+            //          1. just draw the line and overflow outside of the frame
+            //          2. break the word up onto multiple lines
+            //        First do 1, then do 2 and make it an option
             if(word.width > lineWidth) { throw new Error("case not yet handled: single word longer than line"); }
 
             let isFirstWordOfLine = curLine.wordCount == 0;
@@ -98,13 +92,18 @@ export class RichTextView extends View {
         return lines;
     }
 
+    // FIXME: we should cache the results of this similar to how we handle it with getContentHeightForWidth and _getContentHeightForWidth
+    getContentWidth(context: Context) {
+        const lines = this.breakTextRunsIntoLinesForWidth(context, Number.MAX_SAFE_INTEGER);
+        const width = lines.reduce((maxLineWidth, line) => {
+            return maxLineWidth > line.width ? maxLineWidth : line.width;
+        }, 0);
+        return width;
+    }
+
     _getContentHeightForWidth(context: Context, width: number): number {
-        let lines = this.breakTextRunsIntoLinesForWidth(context, width);
-        // console.error(this.textRuns[0].words.join(' '), lines.length);
+        const lines = this.breakTextRunsIntoLinesForWidth(context, width);
         let contentHeight = 0;
-        // if(this.name != 'unnamed') {
-        //     console.log('RichTextView:', `${this.name} ${lines.length} ${width}`);
-        // }
         lines.forEach( (line) => {
             contentHeight += line.height + this.lineGap;
         });
@@ -115,9 +114,6 @@ export class RichTextView extends View {
         super.drawSelf(context);
         let lines = this.breakTextRunsIntoLinesForWidth(context, this.frame.width);
         let cury = 0;
-        // if(this.name != 'unnamed') {
-        //     console.log('draw RichTextView:', `${this.name} ${lines.length} ${this.frame.width}`);
-        // }
         lines.forEach( (line) => {
             let x;
             if(this.alignment == HorizontalAlignment.Left) {
