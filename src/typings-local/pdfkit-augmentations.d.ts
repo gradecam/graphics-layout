@@ -1,3 +1,4 @@
+// FIXME: why doesn't this need to import 'pdfkit' in order to augment it???
 declare namespace PDFKit.Mixins {
 
     interface FontMetricsInfo {
