@@ -92,10 +92,6 @@ function getMatchingDeclarations(node: htmlparser2.ElementNode, allRules: Parsed
     const all = allRules.allRules;
     for(const selectorString of Object.keys(all)) {
         const rule = all[selectorString];
-        const nodeEssentials = {
-            tagName: node.name,
-            attribs: node.attribs
-        };
         if(CSSselect.is(node, selectorString)) {
             propertyMap = {...propertyMap, ...rule.props};
         }
