@@ -1,11 +1,8 @@
-import * as PDFDocument from 'pdfkit';
-import {
-    Context,
-    FontMetrics,
-    TextOpts,
-    Point,
-    ImageOpts
-} from './Context';
+import * as PDFDoc from 'pdfkit';
+export const PDFDocument = PDFDoc;
+export type PDFDocument = typeof PDFDocument;
+
+import { Context, FontMetrics, TextOpts, Point, ImageOpts } from './Context';
 
 function strEnum<T extends string>(o: Array<T>): {[K in T]: K} {
   return o.reduce((res, key) => {
@@ -14,6 +11,7 @@ function strEnum<T extends string>(o: Array<T>): {[K in T]: K} {
   }, Object.create(null));
 }
 
+// I think TypeScript has real string enums now
 export const StandardPdfFonts = strEnum([
   'Courier',
   'Helvetica',
@@ -28,12 +26,12 @@ interface CustomFontMap {
 }
 
 export class PdfKitContext extends Context {
-    private doc: PDFKit.PDFDocument;
+    private doc: PDFDocument;
     private customFontHandlers: CustomFontMap = {};
     private _currentFont: string;
     private _currentFontSize: number;
 
-    setDoc(newDoc: PDFKit.PDFDocument): PdfKitContext {
+    setDoc(newDoc: PDFDocument): PdfKitContext {
         if(!newDoc.currentFontMetrics) {
             throw new Error('the PDFDocument instance you passed in does not include the requried extensions.');
         }
