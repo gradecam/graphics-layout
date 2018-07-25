@@ -7,8 +7,9 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc --project .",
-    "dev": "tsc --watch --project .",
+    "build": "tsc --project .; cp src/HtmlRenderer/UserAgent.css dist/HtmlRenderer/",
+    "watch": "tsc --watch --project .",
+    "clean": "rm -Rf dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -18,7 +19,9 @@
   ],
   "dependencies": {
     "css": "^2.2.1",
+    "css-select": "^2.0.0",
     "css-value": "0.0.1",
+    "css-what": "^2.1.0",
     "htmlparser2": "^3.9.2",
     "pdfkit": "git+https://github.com/gradecam/pdfkit.git#built"
   },

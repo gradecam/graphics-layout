@@ -1,6 +1,6 @@
-import {View, HeightCache} from './View';
-import {Context} from '../Context';
-import {ColumnDesc} from '../ViewDescriptions';
+import { View, HeightCache } from './View';
+import { Context } from '../contexts';
+import { ColumnDesc } from './ViewDescriptions';
 
 export class ColumnView extends View {
     public fitHorizontal = true;
@@ -14,12 +14,26 @@ export class ColumnView extends View {
         return column;
     }
 
+    constructor() {
+        super();
+        this.useAutoWidths = true;
+        this._debugOutlineColor = null;
+    }
+
     toJSON(): any {
         return {type: 'Column', name: this.name, frame: this.frame, subviews: this.subviews};
     }
 
     setDescFields(desc: ColumnDesc) {
         super.setDescFields(desc);
+    }
+
+    getContentWidth(context: Context) {
+        const width = this.subviews.reduce((maxWidth: number, sub) => {
+            const subContentWidth = sub.getContentWidth(context);
+            return maxWidth > subContentWidth ? maxWidth : subContentWidth;
+        }, 0);
+        return width;
     }
 
     _getContentHeightForWidth(context: Context, width: number): number {
@@ -32,8 +46,8 @@ export class ColumnView extends View {
         for(let subview of this.subviews) {
             let largerMargin = subview.topMargin > previousBottomMargin ? subview.topMargin : previousBottomMargin;
             if(this.useContentHeight) {
-                // FIXME: if this.fitHorizontal is false then the width here should probably be the frame width
-                contentHeight += subview.getContentHeightForWidth(context, width) + largerMargin;
+                const subWidth = this.fitHorizontal ? width : subview.getAutoWidth(context);
+                contentHeight += subview.getContentHeightForWidth(context, subWidth) + largerMargin;
             } else {
                 contentHeight += subview.getFrame().height;
             }
@@ -59,10 +73,8 @@ export class ColumnView extends View {
             if(this.useContentHeight) {
                 newFrame.height = subview.getContentHeightForWidth(context, newFrame.width);
             }
-            // console.error('newFrame:', newFrame);
             subview.setFrameWithRect(newFrame);
             cury += subview.getFrame().height;
-            // console.error('cury:', cury);
             previousBottomMargin = subview.bottomMargin;
         }
     }

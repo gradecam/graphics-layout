@@ -1,4 +1,4 @@
-import {ViewDesc} from './ViewDescriptions';
+import {ViewDesc} from '../ViewDescriptions';
 
 export class Rect {
     public left:  number = 0;

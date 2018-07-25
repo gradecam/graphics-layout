@@ -1,7 +1,7 @@
 import {Word} from './Word';
 import {TextRun} from './TextRun';
 import {TextStyle} from './TextStyle';
-import {Context} from './Context';
+import {Context} from '../../contexts';
 
 export class TextLine {
     private words: Word[] = [];

@@ -1,7 +1,6 @@
-import {Context} from '../Context';
-import {Rect} from '../Rect';
-import {ViewDesc} from '../ViewDescriptions';
-import {Factory} from '../Factory';
+import { Context } from '../contexts';
+import { Rect } from './helpers';
+import { ViewDesc } from './ViewDescriptions';
 
 export interface HeightCache {
     [width: number]: number;
@@ -10,13 +9,26 @@ export interface HeightCache {
 export class View {
 
     private parent: View | null = null;
-    public subviews: View[] = [];
-    protected frame: Rect;
-    protected absoluteFrame: Rect;
-    public name: string = 'unnamed';
-    public _debugOutlineColor: string | null;
     private _cacheContentHeights = true;
     private _contentHeightCache: HeightCache = {};
+    protected frame: Rect;
+    protected absoluteFrame: Rect;
+    public subviews: View[] = [];
+    public fixedWidth?: number;
+
+    /**
+     * useAutoWidths is a flag to determine if a container should use the automatically calculated
+     * width of it's subviews during layoutSubviews, or if it should give it a width according to it's
+     * own internal logic. For instance if `useAutoWidths = false` then a FrameView might expand a subview's
+     * frame to fit it's own width - the sum of it's side thicknesses. A column view might expand the width
+     * of it's subviews to be the same as it's own width.
+     *
+     * "useAutoWidths" is perhaps a bit ambiguous since it's not clear what auto refers to the "auto" refers to.
+     * maybe we should negate it and call it useSubvewFrameWidths
+     */
+    public useAutoWidths = false;
+    public name: string = 'unnamed';
+    public _debugOutlineColor: string | null;
 
     constructor() {
         this.frame = new Rect();
@@ -50,12 +62,8 @@ export class View {
         // handle the frame
         let rect = Rect.fromDesc(desc);
         this.setFrameWithRect(rect);
-        // handle the subviews
-        if(!desc.subviews) { return; }
-        for(let subviewDesc of desc.subviews) {
-            this.addSubview( Factory(subviewDesc) );
-        }
         if(desc._debugOutlineColor !== undefined) { this._debugOutlineColor = desc._debugOutlineColor; }
+        if(desc.fixedWidth !== undefined) { this.fixedWidth = desc.fixedWidth; }
     }
 
     get leftMargin(): number {
@@ -131,6 +139,26 @@ export class View {
                 .rect(0, 0, this.frame.width, this.frame.height)
                 .stroke();
         }
+    }
+
+    /**
+     * There are basically two situations for View widths. One is we set the frame ahead of time and don't touch the width
+     * whille rendering. The other is we want some view to auto-calculate the width based on the View's settings. This is
+     * how we auto-calculate the width in second case. The rules for when it uses which method are complex and outside the
+     * scope of this comment.
+     */
+    getAutoWidth(context: Context): number {
+        if(this.fixedWidth !== undefined) {
+            return this.fixedWidth;
+        } else {
+            return this.getContentWidth(context);
+        }
+    }
+
+    // FIXME: would it make sense to return the leftmost leftside and rightmost rightside
+    //        of the frames of it's subviews?
+    getContentWidth(context: Context): number {
+        return 0;
     }
 
     getContentHeightForWidth(context: Context, width: number): number {

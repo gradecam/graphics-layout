@@ -1,20 +1,15 @@
-import * as PDFDocument from 'pdfkit';
-
-export {Factory} from './Factory';
-export {StandardPdfFonts, PdfKitContext} from './PdfKitContext';
+export { StandardPdfFonts, Context, PdfKitContext, PDFDocument  } from './contexts';
 export {
-    ViewDesc,
-    RichTextDesc,
-    ColumnDesc,
-    TextRunDesc,
-    RowDesc,
-    FrameDesc,
-    AnyView,
-    TextStyleDesc
-} from './ViewDescriptions';
-export {View} from './views';
-export {HorizontalAlignment, VerticalAlignment} from './Alignment';
-export {FrameView} from './views/FrameView';
-export {renderHtml, HtmlRenderOpts, FontSelector, CssSelectorMap, CssValuePart} from './HtmlRenderer';
-export {Point} from './Context';
-export { PDFDocument };
+    ViewDesc, View, FrameView,
+    RichTextDesc, ColumnDesc, TextRunDesc, RowDesc, FrameDesc,
+    AnyView, Factory, TextStyleDesc
+} from './views';
+export { HorizontalAlignment, VerticalAlignment } from './views/helpers/Alignment';
+export {
+    // renderHtml, HtmlRenderOpts,
+    FontSelector, CssSelectorMap, CssValuePart,
+    simpleRenderer, mediumRenderer, fullRenderer,
+    simpleRendererOpts, mediumRendererOpts, fullRendererOpts,
+    RendererOpts
+} from './HtmlRenderer';
+export {Point} from './contexts/Context';

@@ -4,16 +4,29 @@
             - try to do some profiling to see how much it's actually impacting performance
             - investigate how much style re-use you could do in order to reduce resource usage
             - investigate if making some attributes optional, where undefined = the default improves things
+    - fullRenderer.ts
+        - calling CSSselect.is and passing in a string for the "query" is probably very slow
+            - 'css-select' has a way to pre-compile selectors. Do that and see if it speeds it up
+            - you could also possibly write your own matching engine based on the already parsed selectors and DomUtils
 - css
-    - extract all style tags before doing any other parsing and combine them with the styles from the user agent style sheet
-    - support more css selectors
-        - class
-        - id
-        - [selector] [selector]
-        - [selector] > [selector]
-    - abstract out the css libraries we are working
-        - define all of our own data structures
-        - defined all the the functions that we need
-        - wrap the node modules that we are using in those functions
-        - make sure they return our data structures
-        - add useCssProcessor so that different processors can be plugged in
+    - in fullRenderer.ts
+        - extract all style tags before doing any other parsing
+        - combine them with the styles from the user agent style sheet and any passed in custom styles
+    - fix CSS merging bugs
+        - there are a bunch of places where css data structures are being merged where data will be overwritten
+        - the bug is triggered if multiple rules have the same selctor
+        - get css-what typings added into css-what or DefinitelyTyped
+- html
+    - create a pull request to get the new typings info into htmlparser2
+- modularize: break out the following modules
+    - graphics-context
+    - graphics-context-pdfkit
+    - graphics-context-fpdf
+    - graphics-view
+    - break each view into it's own module (eg. graphics-view-column)
+    - graphics-view-pack (bundle up all the view necessary for html rendering into a single package)
+    - graphics-html-renderer
+- testing
+    - create test suites for the various modules
+    - for the html engine make a static site to view the output
+        - compare it's renderings to browser rendererings
