@@ -95,7 +95,6 @@ function combineTwoRuleMaps(mapa: ParsedCssRuleMap, mapb: ParsedCssRuleMap): Par
 export function cssStringToSelectorMap(cssString: string, fontSelector?: FontSelector): CssSelectorMap {
 
     const stylesheet = css.parse(cssString).stylesheet;
-    // console.log(JSON.stringify({stylesheet}, null, 4));
     const selectorMap: CssSelectorMap = {};
     if(stylesheet && stylesheet.rules) {
 

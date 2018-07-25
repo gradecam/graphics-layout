@@ -1,4 +1,3 @@
-// console.log('including ColumnView');
 import { View, HeightCache } from './View';
 import { Context } from '../contexts';
 import { ColumnDesc } from './ViewDescriptions';
