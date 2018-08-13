@@ -28,7 +28,6 @@ export class ImageView extends View {
 
     drawSelf(context: Context) {
         super.drawSelf(context);
-        // console.log(this.getFrame());
         context.image(this.filename, this.frame.left, this.frame.top, {width: this.frame.width});
     }
 }

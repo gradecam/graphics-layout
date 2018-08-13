@@ -74,7 +74,6 @@ const htmlParser: HtmlParser<CssSelectorMap> = {
                 const globalDeclarations = getMatchingDeclarations(parsedUACSS, parsedTag.name, parsedTag.id, parsedTag.classes);
 
                 // handle the inline styles from the tag's style attribute
-                // console.log('attribs.style:', attribs.style);
                 const tagDeclarations = attribs.style
                     ? parseCssString(`this { ${attribs.style} }`).this
                     : {} ;

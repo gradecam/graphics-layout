@@ -162,10 +162,8 @@ export function cssStringToSelectorMap(cssString: string, fontSelector?: FontSel
 
 export function parseSelector(selectorString: string): ParsedCssSubSelector[] {
     const subs: ParsedCssSubSelector[] = [];
-    // cssParse isn't a good name since it's only for selector strings. pick a new one
     const wrappedParsedSelector = cssParse(selectorString);
     const parsedSelector = wrappedParsedSelector[0];
-    // console.log({parsedSelector});
     const subIt = parsedSelector[Symbol.iterator]();
     let parsedSub: ParsedCssSubSelector = {};
     while(true) {

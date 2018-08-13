@@ -41,7 +41,6 @@ const cssShorthandExpansionMap: CssShorthandExpansionMap = {
 };
 
 function CssSideExpansion(propertyPrefix: string, propertySuffix: string, parts: CssValuePart[]): SimpleCssDeclaration[] {
-    // console.log({propertyPrefix, propertySuffix, parts});
     let simpleDeclarations: SimpleCssDeclaration[] = [];
     propertySuffix = propertySuffix != '' ? `-${propertySuffix}` : '';
     if(parts.length == 1) {
@@ -65,7 +64,6 @@ function CssSideExpansion(propertyPrefix: string, propertySuffix: string, parts:
         simpleDeclarations.push({property: `${propertyPrefix}-bottom${propertySuffix}`, value: parts[2]});
         simpleDeclarations.push({property: `${propertyPrefix}-left${propertySuffix}`, value: parts[3]});
     }
-    // console.log(JSON.stringify({simpleDeclarations}, null, 4));
     return simpleDeclarations;
 }
 
