@@ -50,7 +50,6 @@ export class TextLine {
             style: TextStyle;
             ascender: number;
             descender: number;
-            toBeContinued: boolean;
         }
         let runs: TextRun[] = [];
 
@@ -59,52 +58,32 @@ export class TextLine {
             style: this.words[0].parts[0].style,
             ascender: this.words[0].parts[0].ascender,
             descender: this.words[0].parts[0].descender,
-            toBeContinued: this.words.length > 1
         };
         this.words.forEach( (word, wordIndex) => {
-            if(word.parts.length == 1) {
+            for(let [partIndex, part] of word.parts.entries()) {
                 // this comparison only works because the words were originally part of the same text run, then that
                 // text run was broken into words for line breaking, and a reference to that text run's style was stored
                 // in each word. So we can use that to put them back into text runs now that they are broken into lines
-                if(lastStyleInfo.style == word.parts[0].style) {
-                    const leadingSpace = wordIndex == 0 ? '' : ' ';
-                    // const leadingSpace = '';
-                    currentRunText += leadingSpace + word.parts[0].wordPart;
+                if(lastStyleInfo.style == part.style) {
+                    // if this is not the first word, but it is the first part of the word, then we need to add a space
+                    // in to cause words to actually be separated
+                    const leadingSpace = wordIndex >= 0 && partIndex == 0 ? ' ' : '';
+                    currentRunText += leadingSpace + part.wordPart;
                 } else {
                     const newRun = new TextRun(currentRunText);
                     newRun.style = lastStyleInfo.style;
                     newRun.ascender = lastStyleInfo.ascender;
                     newRun.descender = lastStyleInfo.descender;
+                    // if this is the first part of a new word then the contents of `currentRunText` ends at a word boundary so
+                    // this text run should not attempt to join with the following one
+                    newRun.lastWordToBeContinued = partIndex > 0;
                     runs.push(newRun);
-                    currentRunText = word.parts[0].wordPart;
+                    currentRunText = part.wordPart;
                     lastStyleInfo = {
-                        style: word.parts[0].style,
-                        ascender: word.parts[0].ascender,
-                        descender: word.parts[0].descender,
-                        toBeContinued: false
+                        style: part.style,
+                        ascender: part.ascender,
+                        descender: part.descender
                     };
-                }
-            } else {
-                for(let [partIndex, part] of word.parts.entries()) {
-                    if(lastStyleInfo.style == part.style) {
-                        const leadingSpace = wordIndex >= 0 && partIndex == 0 ? ' ' : '';
-                        // const leadingSpace = '';
-                        currentRunText += leadingSpace + part.wordPart;
-                    } else {
-                        const newRun = new TextRun(currentRunText);
-                        newRun.style = lastStyleInfo.style;
-                        newRun.ascender = lastStyleInfo.ascender;
-                        newRun.descender = lastStyleInfo.descender;
-                        newRun.lastWordToBeContinued = lastStyleInfo.toBeContinued;
-                        runs.push(newRun);
-                        currentRunText = part.wordPart;
-                        lastStyleInfo = {
-                            style: part.style,
-                            ascender: part.ascender,
-                            descender: part.descender,
-                            toBeContinued: partIndex < word.parts.length - 1
-                        };
-                    }
                 }
             }
         });
