@@ -176,7 +176,10 @@ function printDescTree(rootView: ViewDesc, depth: number = 0) {
     if(1 < 2) {
         return false;
     }
-    console.log("  ".repeat(depth) + `{${rootView.type}}`);
+    const extra = rootView.type == 'RichText'
+        ? (<any>rootView).runs.map((r: any) => `{"${r.text}" ${r.lastWordToBeContinued || false}}`).join(' ')
+        : '' ;
+    console.log("  ".repeat(depth) + `{${rootView.type} ${extra}}`);
     if(!rootView.subviews) { return; }
     for(const sub of rootView.subviews) {
         printDescTree(sub, depth + 1);
