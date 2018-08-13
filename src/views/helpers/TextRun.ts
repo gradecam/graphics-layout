@@ -36,6 +36,13 @@ export class TextRun {
         return this;
     }
 
+    /**
+     * Breaks up the TextRun into an array of `Word`s.
+     * @param context
+     * @param carryOver
+     * @param collect A callback to capture the results. `toBeContinued` is to be combined with the
+     *                first word on the next run.
+     */
     breakIntoGraphicsWords(
         context: Context,
         carryOver: Word | null,

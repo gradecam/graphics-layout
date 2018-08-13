@@ -1,6 +1,10 @@
 import { Context } from '../../contexts';
 import { TextStyle } from './TextStyle';
 
+/**
+ * A Word is an atomic unit of text that can't be broken accross lines.
+ * It maybe have multiple style runs within the word represented as `WordPart`s
+ */
 export class Word {
     public parts: WordPart[];
     private _spaceWidth: number;
