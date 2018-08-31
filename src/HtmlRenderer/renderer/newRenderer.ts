@@ -78,6 +78,13 @@ export function newRenderer<PC>(htmlParser: HtmlParser<PC>): Renderer<PC> {
                     // check to see if we have a non-breaking space
                     let hasLeadingWhiteSpace: boolean;
                     let hasTrailingWhiteSpace: boolean;
+                    // FIXME: non-breaking spaces are not handled correctly
+                    // 1. simpleRenderer and mediumRenderer send text in differently from fullRenderer because
+                    //    the dom handler used in fullRenderer consolidates all text parts into a single node
+                    //    whereas using htmlparser2 directly as in simpleRenderer and mediumRenderer always passes
+                    //    non-breaking spaces separately in a single call to ontext()
+                    // 2. RichTextView and TextRun need to be updated to do proper wrapping with non-breaking spaces
+                    //    what's happneing in there right now is passable but it's not correct
                     const isNonBreakingSpace = text == "\u00A0";
                     if(isNonBreakingSpace) {
                         hasLeadingWhiteSpace = false;

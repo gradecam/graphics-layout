@@ -152,13 +152,28 @@ const htmlParser: HtmlParser<ParsedCssRuleMap> = {
 
                         callbacks.onopentag({tagName: domUtils.getName(node), attrs: node.attribs}, combinedDeclarations);
                     } else if (domUtils.getText(node).trim()) {
-                        // special handling for non breaking spaces
-                        const parts = domUtils.getText(node).split("\u00A0");
-                        callbacks.ontext(parts.shift() || '');
-                        for(const part of parts) {
-                            callbacks.ontext("\u00A0");
-                            callbacks.ontext(part);
-                        }
+                        // FIXME: simpleRenderer and mediumRenderer send text in differently from fullRenderer because
+                        //    the dom handler used here consolidates all text parts into a single node whereas using
+                        //    htmlparser2 directly as in simpleRenderer and mediumRenderer always passes non-breaking
+                        //    spaces separately in a single call to ontext()
+                        //
+                        //    What we need to do is
+                        //      1. figure out how to best handle wrapping non-breaking spaces in views/RichTextView
+                        //         and views/helpers/TestRun, and implment that
+                        //      2. figure out what kind of input newRenderer needs in order to create the text runs
+                        //         in a way that RichTextView and TextRun can handle
+                        //      3. make sure all of the renderers can and are passing in text that way
+                        //
+                        //    We may need to do something like this in order ot mimic what htmlparser2 does when it calls ontext()
+                        //
+                        // const parts = domUtils.getText(node).split("\u00A0");
+                        // callbacks.ontext(parts.shift() || '');
+                        // for(const part of parts) {
+                        //     callbacks.ontext("\u00A0");
+                        //     callbacks.ontext(part);
+                        // }
+
+                        callbacks.ontext(domUtils.getText(node));
                     }
                     depth++;
                     const children = domUtils.getChildren(node) || [];
@@ -172,7 +187,7 @@ const htmlParser: HtmlParser<ParsedCssRuleMap> = {
                 }
                 traverseNode(root);
             }
-        }, {normalizeWhitespace: false});
+        }, {normalizeWhitespace: true});
         const domParser = new htmlparser2.Parser(domHandler, {decodeEntities: true});
         domParser.write(`<html>${html}</html>`);
         domParser.end();
