@@ -152,7 +152,13 @@ const htmlParser: HtmlParser<ParsedCssRuleMap> = {
 
                         callbacks.onopentag({tagName: domUtils.getName(node), attrs: node.attribs}, combinedDeclarations);
                     } else if (domUtils.getText(node).trim()) {
-                        callbacks.ontext(domUtils.getText(node));
+                        // special handling for non breaking spaces
+                        const parts = domUtils.getText(node).split("\u00A0");
+                        callbacks.ontext(parts.shift() || '');
+                        for(const part of parts) {
+                            callbacks.ontext("\u00A0");
+                            callbacks.ontext(part);
+                        }
                     }
                     depth++;
                     const children = domUtils.getChildren(node) || [];
@@ -166,7 +172,7 @@ const htmlParser: HtmlParser<ParsedCssRuleMap> = {
                 }
                 traverseNode(root);
             }
-        });
+        }, {normalizeWhitespace: false});
         const domParser = new htmlparser2.Parser(domHandler, {decodeEntities: true});
         domParser.write(`<html>${html}</html>`);
         domParser.end();

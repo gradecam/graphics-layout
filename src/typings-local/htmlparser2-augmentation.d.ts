@@ -3,7 +3,7 @@ import * as htmlparser2 from 'htmlparser2';
 declare module 'htmlparser2' {
     const DomUtils: DomUtils;
     class DomHandler {
-        constructor(callback: (err: any, dom: Node[]) => void);
+        constructor(callback: (err: any, dom: Node[]) => void, options?: any);
     }
     interface DomUtils {
         /**
