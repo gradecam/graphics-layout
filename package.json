@@ -1,6 +1,6 @@
 {
   "name": "graphics-layout",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "A TypeScript library for rendering complex PDFs and images",
   "author": "GradeCam LLC",
   "license": "MIT",
